@@ -4,6 +4,78 @@
 #### REVIEW: BASICS AND DATA TYPES ####
 
 #### Arithmetic ####
+x=5
+(log(x*3)-4)^2
+gm=gapminder5
+1>2
+1+1==2
+'eat'!='drink'
+1==1 & 1==2
+library(tidyverse)
+?recode
+set.seed(1234)
+x1 <- rnorm(5)
+x2 <- rnorm(20, mean=0.5)
+x1[3]
+x1[x1<0]
+x2[x2>1]
+x3=x2[1:5]
+x3[-3]
+vec <- c(1, 8, NA, 7, 3)
+mean(vec, na.rm = T)
+sum(is.na(vec))
+mat <- matrix(c(1:51, rep(NA,4)), ncol=5)
+mat[4,5]
+sum(is.na(mat))
+mat[3,]
+df1=mtcars
+names(df1)
+df1$mpg
+df1[4,]
+cylsq=(df1$cyl)^2
+getwd()
+gm=read.csv(file.choose(), header = T,stringsAsFactors = F)
+summary(gm)
+gm
+str(gm)
+mean(gm$pop)
+table(gm$year)
+prop.table(table(gm$continent))
+gm07=gm[gm$year==2007,]
+sort(table(gm07$continent))
+gm07$pop[gm07$country=='Mexico']
+head(gm07[order(gm07$pop,decreasing=T),])
+lifeexp_round=round(gm07$lifeExp)
+gm07$lifeExp_over70 <- NA  # Initialize a variable containing all "NA" values
+gm07$lifeExp_over70[gm07$lifeExp>70] <- "Yes"
+gm07$lifeExp_over70[gm07$lifeExp<70] <- "No"
+table(gm07$lifeExp_over70)
+
+
+
+gm07$lifeExp_highlow <- NA  # Initialize a variable containing all "NA" values
+gm07$lifeExp_highlow[gm07$lifeExp>mean(gm07$lifeExp)] <- "High"
+gm07$lifeExp_highlow[gm07$lifeExp<mean(gm07$lifeExp)] <- "Low"
+table(gm07$lifeExp_highlow)
+aggregate(gm07$lifeExp ~ gm07$continent, FUN = mean)
+cor(gm07$lifeExp,gm07$gdpPercap)
+?t.test
+t.test(gm07$gdpPercap~gm07$lifeExp_highlow)
+
+reg1=lm(gm07$lifeExp~gm07$gdpPercap+gm07$pop,data=gm07)
+summary(reg1)
+reg1
+
+write.csv(gm07,'data/gapminder07.csv',row.names=F)
+
+hist(gm07$lifeExp,main='gm07 LifeExp',xlab = 'Life Exp', ylab = 'Freq',breaks='Sturges')
+?hist
+
+plot(gm07$gdpPercap,gm07$lifeExp, main = 'life exp vs gdppercap',xlab = 'gdppercap', ylab='Life Exp')
+abline(h=mean(gm07$lifeExp))
+
+
+
 
 # Pick a number; save it as x
 
