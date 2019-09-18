@@ -6,9 +6,9 @@ output: html_document
 ---
 
 ```{r global_options, echo = FALSE, include = FALSE}
-knitr::opts_chunk$set(echo=answers, eval=answers,
-                      warning = FALSE, message = FALSE,
-                      cache = FALSE, tidy = FALSE)
+#knitr::opts_chunk$set(echo=answers, eval=answers,
+                    #  warning = FALSE, message = FALSE,
+            #          cache = FALSE, tidy = FALSE)
 ```
 
 <!-- BEFORE YOU START, REMEMBER TO RENAME THE .RMD FILE AND SAVE IT AS day2_exercises_LastNameFirstName.Rmd AND THEN REMOVE THIS INSTRUCTION -->
@@ -17,7 +17,16 @@ knitr::opts_chunk$set(echo=answers, eval=answers,
 
 Read both California energy datasets. Make sure the `datetime` variable is in an appropriate data type (i.e. not character). 
 
-```{r}
+```{r read_data}
+library(here)
+library(readr)
+generation <- read.csv("../data/ca_energy_generation.csv", stringsAsFactors = F)
+imports <- read.csv("../data/ca_energy_imports.csv",stringsAsFactors = F)
+library(lubridate)
+generation$datetime <- as_datetime(generation$datetime)
+class(generation$datetime)
+imports$datetime <- as_datetime(imports$datetime)
+class(imports$datetime)
 
 ```
 
@@ -26,8 +35,15 @@ Read both California energy datasets. Make sure the `datetime` variable is in an
 
 Merge the two datasets and then melt the resulting dataframe/datatable to make it tidy.
 
-```{r}
 
+
+```{r merging}
+library(reshape2)
+merged_energy <- merge(generation, imports, by = "datetime")
+dim(merged_energy)
+long_merged_energy <- melt(merged_energy, id.vars = "datetime",
+                           variable.name = "source",
+                           value.name = "usage")
 ```
 
 
@@ -41,7 +57,14 @@ Create a series of new variables:
 
 Bonus: If you are using `dplyr`, try to do this all in one pipe!
 
-```{r}
+```{r new variables}
+library(data.table)
+setDT(merged_energy)
+setDT(long_merged_energy)
+library(tidyverse)
+long_merged_energy[,day := as_date(datetime)]
+long_merged_energy[,log_output := log(usage)]
+long_merged_energy[,per_output := usage/sum(usage), by = day]
 
 ```
 
@@ -52,7 +75,10 @@ Bonus: If you are using `dplyr`, try to do this all in one pipe!
 2. Which source has the greatest mean output by day? Which has the least? (Do not include zero values.)
 3. Which sources has the greatest variance in usage over the course of a dataset? Which has the least? (Do not include zero values.)
 
-```{r}
+```{r summarizing}
+
+hour_mean <- long_merged_energy[,.(hour_mean = mean(usage)), by = source]
+setorder(hour_mean, -hour_mean)
 
 ```
 
@@ -64,6 +90,7 @@ The dataset `regroup.csv` has information about which sources are considered ren
 Hint: Use your merge skills to merge the CA energy data with the `regroup` data. Which variable should you join by?
 
 ```{r}
-
+regroup=fread("../data/ca_energy_regroup.csv")
+merge3=merge(long_merged_energy,regroup,by.x ="source",by.y="type")
 ```
 
